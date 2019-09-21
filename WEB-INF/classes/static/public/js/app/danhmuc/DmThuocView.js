@@ -1,26 +1,28 @@
-var DmHangSanXuatView = function(){
+var DmThuocView = function(){
 	
 	var that = this;
-	this.AppTitle = 'Danh mục chủng loại';
+	this.AppTitle = 'Danh mụ thuốc';
 	this.oTable = null;
 	this.oDialog = null;
-
-	this.oDmHangSanXuat = new DmHangSanXuat();
+	this.oDmDonViTinh = new DmDonViTinh();
+	this.oDmThuoc = new DmThuoc();
 	
 	this.initPage = function(){
+		that.oDmThuoc = new DmThuoc();
 		$('#AppTitle').html(that.AppTitle);
-		that.search();
-		that.clearForm();
+		that.oDmDonViTinh.bindSelect('#donvitinhid');
+		that.bindGrid01();
 		that.filterAction('INIT');
+		that.bindForm();
 	}
 
-	this.search = function(){
-		that.oDmHangSanXuat.search('');
+	this.bindGrid01 = function(){
+		that.oDmThuoc.getAll();
 		that.oTable.clear().draw();
         var aRows = [];
-		for (var i = 0; i < that.oDmHangSanXuat.LIST.length; i++) {
-			var item = that.oDmHangSanXuat.LIST[i];
-			var _hidden = '<input type="hidden" class="rowID" value="' + item.hangsanxuatid + '" />';
+		for (var i = 0; i < that.oDmThuoc.LIST.length; i++) {
+			var item = that.oDmThuoc.LIST[i];
+			var _hidden = '<input type="hidden" class="rowID" value="' + item.thuocid + '" />';
 			var trangthai = item.trangthai == 1?'<span class="label label-success">Hoạt động</span>':'<span class="label label-danger">Khóa</span>';
 			aRows.push([
 				(i + 1) + _hidden,
@@ -34,14 +36,15 @@ var DmHangSanXuatView = function(){
 	}
 
 	this.bindForm = function(){
-		$('#ma').val(that.oDmHangSanXuat.ma);
-		$('#ten').val(that.oDmHangSanXuat.ten);
-		$('#ghichu').val(that.oDmHangSanXuat.ghichu);
-		$('#trangthai').val(that.oDmHangSanXuat.trangthai);
+		$('#ma').val(that.oDmThuoc.ma);
+		$('#ten').val(that.oDmThuoc.ten);
+		$('#ghichu').val(that.oDmThuoc.ghichu);
+		$('#donvitinhid').val(that.oDmThuoc.donvitinhid);
+		$('#trangthai').val(that.oDmThuoc.trangthai);
 	}
 
 	this.clearForm = function(){
-		that.oDmHangSanXuat.hangsanxuatid = 0;
+		that.oDmDonViTinh.donvitinhid = 0;
 		$('#ma').val('');
 		$('#ten').val('');
 		$('#ghichu').val('');
@@ -51,7 +54,12 @@ var DmHangSanXuatView = function(){
 	this.filterAction = function(sState){
 		switch (sState) {
 			case 'INIT':
-				ControlHelper.Input.enable(['#btnAddNew','#btnSave','#btnDelete','#btnCancel']);
+				ControlHelper.Input.enable(['#btnSave']);
+				ControlHelper.Input.disable(['#btnDelete','#btnCancel']);
+				break;
+			case 'SELECT':
+				ControlHelper.Input.disable(['#btnSave']);
+				ControlHelper.Input.enable(['#btnDelete','#btnCancel']);
 				break;
 			default:
 				break;
@@ -60,22 +68,16 @@ var DmHangSanXuatView = function(){
 
 	this.save = function(){
 		var oAlert = new AlertDialog('Thông báo');
-		that.oDmHangSanXuat.ma = $('#ma').val();
-		that.oDmHangSanXuat.ten = $('#ten').val();
-		that.oDmHangSanXuat.ghichu = $('#ghichu').val();
-		that.oDmHangSanXuat.trangthai = $('#trangthai').val();
+		that.oDmThuoc.ma = $('#ma').val();
+		that.oDmThuoc.ten = $('#ten').val();
+		that.oDmThuoc.ghichu = $('#ghichu').val();
+		that.oDmThuoc.donvitinhid = $('#donvitinhid').val();
+		that.oDmThuoc.trangthai = $('#trangthai').val();
 
-		var strAlert = that.oDmHangSanXuat.validSave();
-		if (!strAlert == '') {
-			oAlert.show(strAlert, '40%', '50px');
-			return false;
-		}
-
-		var rs = that.oDmHangSanXuat.save();
+		var rs = that.oDmThuoc.save();
 		if (rs.CODE == 0) {
 			oAlert.DialogTitle = 'Thông báo';
-			that.search();
-			that.clearForm();
+			that.initPage();
 		} else {
 			oAlert.DialogTitle = 'Cảnh báo';
 		}
@@ -111,14 +113,16 @@ var DmHangSanXuatView = function(){
             if ($(this).hasClass('selected')) {
 				$(this).removeClass('selected');
 				that.clearForm();
+				that.initPage();
             }
             else {
                 that.oTable.$('tr.selected').removeClass('selected');
                 $(this).addClass('selected');
 				var id = $(this).find('.rowID').val();
-				that.oDmHangSanXuat.hangsanxuatid = id;
-				that.oDmHangSanXuat.getById();
+				that.oDmThuoc.thuocid = id;
+				that.oDmThuoc.getById();
 				that.bindForm();
+				that.filterAction('SELECT');
 		   }
 		   return true;
 		 });
@@ -127,16 +131,15 @@ var DmHangSanXuatView = function(){
 		 $('.ACTIONS').on('click', '#btnDelete', function () {
 			var oConfirm = new ConfirmDialog('Xác nhận xóa thông tin',ok,cancel);
 			var oAlert = new AlertDialog('Thông báo');
-			if (that.oDmHangSanXuat.hangsanxuatid == 0) {
+			if (that.oDmThuoc.thuocid == 0) {
 				oAlert.show('Bạn chưa chọn mục cần xóa', '40%', '50px');
 				return false;
 			}
 
 			function ok() {
-				var rs = that.oDmHangSanXuat.del();
+				var rs = that.oDmThuoc.del();
 				oAlert.show(rs.MESSAGE, '40%', '50px');
-				that.search();
-				that.clearForm();
+				that.initPage();
             }
 
             function cancel() {}
