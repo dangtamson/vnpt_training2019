@@ -3,7 +3,15 @@ var TopBar = function() {
 	var that = this;
 	
 	this.init = function() {
-		
+		var oAUTH =JSON.parse( window.localStorage.getItem('AUTH'));
+		//console.log('INFO | TopBar | oAUTH',oAUTH);
+		if (oAUTH) {
+			$('.UserName').html(oAUTH.UserName);
+			$('.FullName').html(oAUTH.FullName);
+		}else{
+			location.replace(CONFIG_APP.URL.LOGIN);
+		}
+
 	}
 
 	this.getClock = function() {
@@ -91,7 +99,7 @@ var TopBar = function() {
         }); 
         
         $('#btnSignOut').click(function(){
-			AuthenHelper.logout();
+			AUTH.logout();
 		});
 		
 		$('#btnChangePass').click(function(){

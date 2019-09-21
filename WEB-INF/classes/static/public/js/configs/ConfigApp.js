@@ -1,9 +1,9 @@
 const CONFIG_APP = {
-	APPCODE:'demo_qlts',
+	APPCODE:'vnad_vnpt',
 	URL:{
-		CONTEXT : '/qlts'
+		CONTEXT : '/vnpt'
 		,HOME:'/app/common/dashboard'
-		,LOGIN:'/app/common/login'
+		,LOGIN:'/vnpt/app/common/login'
 		,LOGOUT:'http://103.9.77.49/medicauthen/app/common/logout'
 		,CHECK_TOKEN:'ht_token/check'
 	},
