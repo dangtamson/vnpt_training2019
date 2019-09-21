@@ -58,7 +58,7 @@ var DmThuocView = function(){
 				ControlHelper.Input.disable(['#btnDelete','#btnCancel']);
 				break;
 			case 'SELECT':
-				ControlHelper.Input.disable(['#btnSave']);
+				ControlHelper.Input.enable(['#btnSave']);
 				ControlHelper.Input.enable(['#btnDelete','#btnCancel']);
 				break;
 			default:

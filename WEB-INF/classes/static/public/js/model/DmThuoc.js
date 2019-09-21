@@ -59,14 +59,4 @@ var DmThuoc = function(){
 		return  DATA.set(URL.DEL,data);
 	}
 
-	this.bindSelect = function(sId){
-		that.getAll();
-		var html = '';
-		for (let i = 0; i < that.LIST.length; i++) {
-			var item = that.LIST[i];
-			html +='<option  value="'+ item.donvitinhid +'">' + item.ten +'</option>';
-		}
-		$(sControlId).html(html);
-		$(sControlId).select2();
-	}
 }	
